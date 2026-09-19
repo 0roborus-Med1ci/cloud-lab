@@ -107,12 +107,63 @@ app.delete("/api/students/:id", async (req, res) => {
 });
 
 // =========================
+// Seed dữ liệu mặc định
+// =========================
+const seedStudents = async () => {
+    try {
+        const count = await Student.countDocuments();
+        
+        // Nếu database đã có dữ liệu, không seed lại
+        if (count > 0) {
+            console.log("Database already has students, skipping seed.");
+            return;
+        }
+
+        const defaultStudents = [
+            {
+                studentId: "SV001",
+                name: "Nguyễn Văn A",
+                email: "nguyenvana@example.com"
+            },
+            {
+                studentId: "SV002",
+                name: "Trần Thị B",
+                email: "tranthib@example.com"
+            },
+            {
+                studentId: "SV003",
+                name: "Lê Văn C",
+                email: "levanc@example.com"
+            },
+            {
+                studentId: "SV004",
+                name: "Phạm Thị D",
+                email: "phamthid@example.com"
+            },
+            {
+                studentId: "SV005",
+                name: "Vũ Văn E",
+                email: "vuvane@example.com"
+            }
+        ];
+
+        await Student.insertMany(defaultStudents);
+        console.log("✓ Database seeded with default students");
+    } catch (error) {
+        console.error("Error seeding database:", error);
+    }
+};
+
+// =========================
 // MongoDB + Server
 // =========================
 mongoose
     .connect(MONGODB_URI)
-    .then(() => {
+    .then(async () => {
         console.log("MongoDB Atlas connected successfully!");
+
+        // Seed dữ liệu nếu cần
+        await seedStudents();
 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
