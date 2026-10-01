@@ -1,0 +1,17 @@
+services:
+  backend:
+    image: amon101/mern-backend:1.0
+    container_name: mern-backend-hub
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      PORT: 5000
+
+  frontend:
+    image: amon101/mern-frontend:1.0
+    container_name: mern-frontend-hub
+    ports:
+      - "3000:5173"
+    depends_on:
+      - backend

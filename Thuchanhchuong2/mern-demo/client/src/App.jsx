@@ -157,19 +157,10 @@ function App() {
                             <td>{student.name}</td>
                             <td>{student.email}</td>
                             <td>
-                                <button onClick={() => handleEdit(student)}>
-                                    Sửa
-                                </button>
-
-                                <button
-                                    onClick={() =>
-                                        handleDelete(student._id)
-                                    }
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                        </tr>
+  <button onClick={() => handleEdit(student)}>Sửa</button>
+  <button onClick={() => handleDelete(student._id)}>Xóa</button>
+</td>
+                                </tr>
                     ))}
                 </tbody>
             </table>
