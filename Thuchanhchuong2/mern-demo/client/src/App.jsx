@@ -1,6 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+async function apiRequest(path, options = {}) {
+    const response = await fetch(path, options);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Request failed");
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    return response.json();
+}
+
 function App() {
     const [students, setStudents] = useState([]);
     const [studentId, setStudentId] = useState("");
@@ -8,12 +23,10 @@ function App() {
     const [email, setEmail] = useState("");
     const [editingId, setEditingId] = useState(null);
 
-    // GET students
     const fetchStudents = async () => {
         try {
-           const response = await fetch("http://localhost:5000/api/students");
-            const data = await response.json();
-            setStudents(data);
+            const data = await apiRequest("/api/students");
+            setStudents(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -23,20 +36,14 @@ function App() {
         fetchStudents();
     }, []);
 
-    // POST / PUT
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const studentData = {
-            studentId,
-            name,
-            email
-        };
+        const studentData = { studentId, name, email };
 
         try {
             if (editingId) {
-                // PUT
-                await fetch(`/api/students/${editingId}`, {
+                await apiRequest(`/api/students/${editingId}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
@@ -44,8 +51,7 @@ function App() {
                     body: JSON.stringify(studentData)
                 });
             } else {
-                // POST
-                await fetch("/api/students", {
+                await apiRequest("/api/students", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -65,7 +71,6 @@ function App() {
         }
     };
 
-    // Edit
     const handleEdit = (student) => {
         setEditingId(student._id);
         setStudentId(student.studentId);
@@ -73,14 +78,13 @@ function App() {
         setEmail(student.email);
     };
 
-    // Delete
     const handleDelete = async (id) => {
         if (!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) {
             return;
         }
 
         try {
-            await fetch(`/api/students/${id}`, {
+            await apiRequest(`/api/students/${id}`, {
                 method: "DELETE"
             });
 
@@ -92,7 +96,7 @@ function App() {
 
     return (
         <div className="container">
-            <h1>Student Management</h1>
+            <h1>Student Management v2.0</h1>
 
             <form onSubmit={handleSubmit}>
                 <input
@@ -157,10 +161,10 @@ function App() {
                             <td>{student.name}</td>
                             <td>{student.email}</td>
                             <td>
-  <button onClick={() => handleEdit(student)}>Sửa</button>
-  <button onClick={() => handleDelete(student._id)}>Xóa</button>
-</td>
-                                </tr>
+                                <button onClick={() => handleEdit(student)}>Sửa</button>
+                                <button onClick={() => handleDelete(student._id)}>Xóa</button>
+                            </td>
+                        </tr>
                     ))}
                 </tbody>
             </table>

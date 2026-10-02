@@ -9,7 +9,7 @@ services:
       PORT: 5000
 
   frontend:
-    image: amon101/mern-frontend:1.0
+    image: amon101/mern-frontend:2.0
     container_name: mern-frontend-hub
     ports:
       - "3000:5173"

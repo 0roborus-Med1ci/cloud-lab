@@ -10,8 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
+const PORT = Number(process.env.PORT) || 5000;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/studentdb";
 
 // =========================
 // GET /api/hello
@@ -160,7 +160,9 @@ const seedStudents = async () => {
 mongoose
     .connect(MONGODB_URI)
     .then(async () => {
-        console.log("MongoDB Atlas connected successfully!");
+        console.log(
+            `MongoDB connected: ${mongoose.connection.host}/${mongoose.connection.name}`
+        );
 
         // Seed dữ liệu nếu cần
         await seedStudents();
