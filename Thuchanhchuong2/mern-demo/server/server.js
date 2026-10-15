@@ -35,7 +35,8 @@ app.use(express.json());
 // =========================
 // CẤU HÌNH SERVER
 // =========================
-const PORT = process.env.PORT || 5000;
+
+const PORT = Number(process.env.PORT) || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 // =========================
@@ -193,7 +194,9 @@ if (!MONGODB_URI) {
 mongoose
     .connect(MONGODB_URI)
     .then(async () => {
-        console.log("MongoDB Atlas connected successfully!");
+        console.log(
+            `MongoDB connected: ${mongoose.connection.host}/${mongoose.connection.name}`
+        );
 
         await seedStudents();
 
