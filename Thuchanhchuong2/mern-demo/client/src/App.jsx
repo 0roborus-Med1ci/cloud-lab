@@ -11,7 +11,7 @@ function App() {
     // GET students
     const fetchStudents = async () => {
         try {
-           const response = await fetch("http://localhost:5000/api/students");
+           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/students`);
             const data = await response.json();
             setStudents(data);
         } catch (error) {
@@ -24,46 +24,46 @@ function App() {
     }, []);
 
     // POST / PUT
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const studentData = {
-            studentId,
-            name,
-            email
-        };
-
-        try {
-            if (editingId) {
-                // PUT
-                await fetch(`/api/students/${editingId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(studentData)
-                });
-            } else {
-                // POST
-                await fetch("/api/students", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(studentData)
-                });
-            }
-
-            setStudentId("");
-            setName("");
-            setEmail("");
-            setEditingId(null);
-
-            fetchStudents();
-        } catch (error) {
-            console.error("Error:", error);
-        }
+    const studentData = {
+        studentId,
+        name,
+        email
     };
+
+    try {
+        if (editingId) {
+            // PUT
+            await fetch(`${import.meta.env.VITE_API_URL}/api/students/${editingId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(studentData)
+            });
+        } else {
+            // POST
+            await fetch(`${import.meta.env.VITE_API_URL}/api/students`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(studentData)
+            });
+        }
+
+        setStudentId("");
+        setName("");
+        setEmail("");
+        setEditingId(null);
+
+        fetchStudents();
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
 
     // Edit
     const handleEdit = (student) => {
@@ -74,21 +74,21 @@ function App() {
     };
 
     // Delete
-    const handleDelete = async (id) => {
-        if (!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) {
-            return;
-        }
+const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) {
+        return;
+    }
 
-        try {
-            await fetch(`/api/students/${id}`, {
-                method: "DELETE"
-            });
+    try {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/students/${id}`, {
+            method: "DELETE"
+        });
 
-            fetchStudents();
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    };
+        fetchStudents();
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
 
     return (
         <div className="container">

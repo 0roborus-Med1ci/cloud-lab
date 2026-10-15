@@ -1,8 +1,10 @@
+
 *.log
 *.tmp
-_pycache_/
+__pycache__/
 .env
+.env.*
+!.env.example
 bin/
 build/
-.env
 node_modules/

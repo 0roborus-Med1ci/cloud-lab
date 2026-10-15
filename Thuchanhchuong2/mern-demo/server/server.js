@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -7,9 +8,33 @@ const Student = require("./models/Student");
 
 const app = express();
 
-app.use(cors());
+// =========================
+// CẤU HÌNH CORS LINH HOẠT
+// =========================
+
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    "https://mern-frontend-236248.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000"
+].filter(Boolean);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Origin not allowed by CORS"));
+    },
+    credentials: true
+}));
+
 app.use(express.json());
 
+// =========================
+// CẤU HÌNH SERVER
+// =========================
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -23,7 +48,7 @@ app.get("/api/hello", (req, res) => {
 });
 
 // =========================
-// CÂU 36 - GET students
+// GET /api/students
 // =========================
 app.get("/api/students", async (req, res) => {
     try {
@@ -38,12 +63,11 @@ app.get("/api/students", async (req, res) => {
 });
 
 // =========================
-// CÂU 37 - POST student
+// POST /api/students
 // =========================
 app.post("/api/students", async (req, res) => {
     try {
         const student = await Student.create(req.body);
-
         res.status(201).json(student);
     } catch (error) {
         res.status(400).json({
@@ -54,7 +78,7 @@ app.post("/api/students", async (req, res) => {
 });
 
 // =========================
-// CÂU 38 - PUT student
+// PUT /api/students/:id
 // =========================
 app.put("/api/students/:id", async (req, res) => {
     try {
@@ -83,11 +107,13 @@ app.put("/api/students/:id", async (req, res) => {
 });
 
 // =========================
-// CÂU 39 - DELETE student
+// DELETE /api/students/:id
 // =========================
 app.delete("/api/students/:id", async (req, res) => {
     try {
-        const student = await Student.findByIdAndDelete(req.params.id);
+        const student = await Student.findByIdAndDelete(
+            req.params.id
+        );
 
         if (!student) {
             return res.status(404).json({
@@ -107,15 +133,16 @@ app.delete("/api/students/:id", async (req, res) => {
 });
 
 // =========================
-// Seed dữ liệu mặc định
+// SEED DỮ LIỆU MẶC ĐỊNH
 // =========================
 const seedStudents = async () => {
     try {
         const count = await Student.countDocuments();
-        
-        // Nếu database đã có dữ liệu, không seed lại
+
         if (count > 0) {
-            console.log("Database already has students, skipping seed.");
+            console.log(
+                "Database already has students, skipping seed."
+            );
             return;
         }
 
@@ -148,21 +175,26 @@ const seedStudents = async () => {
         ];
 
         await Student.insertMany(defaultStudents);
-        console.log("✓ Database seeded with default students");
+
+        console.log("Database seeded with default students");
     } catch (error) {
         console.error("Error seeding database:", error);
     }
 };
 
 // =========================
-// MongoDB + Server
+// KẾT NỐI MONGODB + KHỞI ĐỘNG SERVER
 // =========================
+if (!MONGODB_URI) {
+    console.error("MONGODB_URI is not configured!");
+    process.exit(1);
+}
+
 mongoose
     .connect(MONGODB_URI)
     .then(async () => {
         console.log("MongoDB Atlas connected successfully!");
 
-        // Seed dữ liệu nếu cần
         await seedStudents();
 
         app.listen(PORT, () => {
@@ -171,4 +203,5 @@ mongoose
     })
     .catch((error) => {
         console.error("MongoDB connection failed:", error);
+        process.exit(1);
     });
